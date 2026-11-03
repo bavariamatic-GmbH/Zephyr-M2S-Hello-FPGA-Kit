@@ -1,0 +1,3 @@
+# Host-side Python tool (Windows/Linux PC, not the Zephyr container).
+# Tkinter is part of Python (python.org installer on Windows; python3-tk on Ubuntu).
+pyserial==3.5

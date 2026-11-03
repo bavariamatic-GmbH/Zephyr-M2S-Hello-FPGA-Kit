@@ -1,0 +1,77 @@
+/*
+ * SPDX-License-Identifier: Apache-2.0
+ *
+ * M2S Hello FPGA Kit (M2S010-VF256): MSS peripherals used by the demo and the
+ * test GUI.
+ *
+ * i2c0, spi0 and spi1 are defined (disabled) in Zephyr's
+ * dts/arm/microchip/smartfusion2/m2s010.dtsi; this overlay turns them on.
+ * The Libero design must route them as described in
+ * docs/libero-hello-fpga-vf256.md and created by the Libero script in
+ * Libero-Microchip-Hello-FPGA-Kit (all through the FPGA fabric):
+ *   MMUART_0: TX H12, RX H13 (UART_TX_SF2 / UART_RX_SF2 -> PIC32)
+ *   I2C_0:    SDA P8 (Arduino SDA), SCL R8 (Arduino SCL), header J7-9 / J7-10
+ *   SPI_0:    SCK R13 (D13), MOSI R11 (D11), MISO T11 (D12), SS0 M10 (D10), J7
+ *   SPI_1:    SCK T6, MOSI M9 (SI), MISO N10 (SO), SS0 M7 (CS#) -> U8 SST26VF064B
+ *   GPIO_0-2: LD1 T12, LD2 T13, LD3 G13 (debug LEDs of the SmartFusion2)
+ * MSS clocks: M3 100 MHz, APB_0/APB_1 50 MHz, matching the board DTS.
+ */
+
+#include <zephyr/dt-bindings/gpio/gpio.h>
+#include <zephyr/dt-bindings/i2c/i2c.h>
+
+/*
+ * Console: MMUART_0 reaches the kit's USB port through the PIC32, which talks
+ * to the SmartFusion2 at 230400 bit/s (PC side 460800 bit/s, PIC32 forwards
+ * after '&'). Same rate as in SmartManipulator-X-Controller. The fractional
+ * divisor for this rate is set in src/platform/sf2_mmuart.c.
+ */
+&uart0 {
+	current-speed = <230400>;
+};
+
+/* LTR-329ALS light sensor (from apps/02_solution_i2c_driver), GUI I2C tab */
+&i2c0 {
+	status = "okay";
+	clock-frequency = <I2C_BITRATE_STANDARD>;
+};
+
+/* Raw SPI transfers on SS0 (from apps/03_demo_spi_raw_cs1), GUI SPI tab */
+&spi0 {
+	status = "okay";
+};
+
+/*
+ * Debug LEDs LD1-LD3 (schematic sheet 6 "DEBUG LED - SF2"): anode to 3.3 V,
+ * cathode through 330 R to LEDx_DEBUG, so a LED is ON when the pin is LOW.
+ * The board DTS declares led0 GPIO_ACTIVE_HIGH; it is overridden here.
+ * MSS GPIO_0..2 are routed through the fabric to T12, T13, G13.
+ */
+/ {
+	aliases {
+		led1 = &led1;
+		led2 = &led2;
+	};
+
+	leds {
+		led1: user_led_1 {
+			gpios = <&gpio0 1 GPIO_ACTIVE_LOW>;
+			label = "LD2";
+		};
+
+		led2: user_led_2 {
+			gpios = <&gpio0 2 GPIO_ACTIVE_LOW>;
+			label = "LD3";
+		};
+	};
+};
+
+&led0 {
+	gpios = <&gpio0 0 GPIO_ACTIVE_LOW>;
+	label = "LD1";
+};
+
+/* SPI flash U8 (SST26VF064B) on SS0, accessed by src/devices/sst26.c */
+&spi1 {
+	status = "okay";
+};

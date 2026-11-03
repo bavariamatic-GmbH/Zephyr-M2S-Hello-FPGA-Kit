@@ -1,0 +1,63 @@
+{
+    "name": "Zephyr RTOS - SmartFusion2 M2S010",
+
+    "image": "ghcr.io/bavariamatic-gmbh/zephyr-m2s-hello-fpga-kit:1.0.1",
+
+    "remoteUser": "root",
+
+    "containerEnv": {
+        "ZEPHYR_TOOLCHAIN_VARIANT": "zephyr",
+        "ZEPHYR_SDK_INSTALL_DIR": "/opt/zephyr-sdk",
+        "BOARD": "m2s_hello_fpga_kit/m2s010"
+    },
+
+    "hostRequirements": {
+        "cpus": 4,
+        "memory": "8gb"
+    },
+
+    "customizations": {
+        "vscode": {
+            "extensions": [
+                "zephyr-project-rtos.zephyr-ide",
+                "ms-vscode.cpptools",
+                "ms-vscode.cmake-tools",
+                "marus25.cortex-debug",
+                "ms-vscode.vscode-serial-monitor"
+            ],
+
+            "settings": {
+                "terminal.integrated.defaultProfile.linux": "bash",
+
+                "C_Cpp.default.compilerPath": "/opt/zephyr-sdk/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc",
+
+                "C_Cpp.default.compileCommands": "${containerWorkspaceFolder}/build/compile_commands.json",
+
+                "C_Cpp.default.intelliSenseMode": "linux-gcc-arm",
+
+                "cmake.configureOnOpen": false,
+
+                "cmake.buildDirectory": "${containerWorkspaceFolder}/build",
+
+                "files.exclude": {
+                    "**/.git": true,
+                    "**/.west": true
+                },
+
+                "search.exclude": {
+                    "**/build": true,
+                    "**/.west": true,
+                    "**/.ccache": true
+                },
+
+                "editor.formatOnSave": false
+            }
+        }
+    },
+
+    "postCreateCommand": "bash .vscode/ensure-west-workspace.sh && (ccache --zero-stats || true)",
+
+    "postStartCommand": "echo 'Zephyr SmartFusion2 development container ready' && echo 'Board: m2s_hello_fpga_kit/m2s010' && west --version && arm-zephyr-eabi-gcc --version",
+
+    "overrideCommand": true
+}

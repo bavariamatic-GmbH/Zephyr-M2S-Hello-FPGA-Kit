@@ -1,0 +1,23 @@
+/* Board card of the zephyr:board preview directive */
+.hk-board-card {
+    border: 1px solid #e1e4e5;
+    padding: 12px;
+    margin-bottom: 24px;
+    background: #f8f9fa;
+}
+
+.hk-board-card img {
+    display: block;
+    margin: 0 auto 12px auto;
+    max-width: 100%;
+    height: auto;
+}
+
+/* Preview banner on the proposed Zephyr board page */
+.rst-content .admonition.hk-preview {
+    background: #fff4e5;
+}
+
+.rst-content .admonition.hk-preview .admonition-title {
+    background: #f0a030;
+}

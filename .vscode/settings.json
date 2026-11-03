@@ -1,0 +1,30 @@
+{
+    "C_Cpp.default.compilerPath": "/opt/zephyr-sdk/gnu/arm-zephyr-eabi/bin/arm-zephyr-eabi-gcc",
+
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/build/compile_commands.json",
+
+    "C_Cpp.default.intelliSenseMode": "linux-gcc-arm",
+
+    "cmake.configureOnOpen": false,
+
+    "cmake.buildDirectory": "${workspaceFolder}/build",
+
+    "terminal.integrated.cwd": "${workspaceFolder}",
+
+    "files.associations": {
+        "*.overlay": "dts",
+        "Kconfig": "kconfig",
+        "Kconfig.*": "kconfig"
+    },
+
+    "files.exclude": {
+        "**/.git": true,
+        "**/.west": true
+    },
+
+    "search.exclude": {
+        "**/build": true,
+        "**/.west": true,
+        "**/.ccache": true
+    }
+}

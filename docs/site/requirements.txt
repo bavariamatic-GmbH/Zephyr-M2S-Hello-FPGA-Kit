@@ -1,0 +1,6 @@
+# Tools for the project web page (docs/site). Pinned for reproducible builds.
+sphinx==8.2.3
+myst-parser==4.0.1
+sphinx-rtd-theme==3.0.2
+sphinx-copybutton==0.5.2
+sphinx-autobuild==2024.10.3

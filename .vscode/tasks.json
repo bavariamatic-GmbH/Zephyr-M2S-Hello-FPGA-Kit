@@ -1,0 +1,260 @@
+{
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "Zephyr: Ensure workspace",
+            "type": "process",
+            "command": "bash",
+            "args": [
+                ".vscode/ensure-west-workspace.sh"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Zephyr: Workspace Menu",
+            "type": "process",
+            "command": "bash",
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            },
+            "problemMatcher": [],
+            "linux": {
+                "args": [
+                    ".vscode/workspace-menu.sh",
+                    "${input:zephyrAction}"
+                ]
+            },
+            "windows": {
+                "command": "powershell.exe",
+                "args": [
+                    "-NoProfile",
+                    "-ExecutionPolicy",
+                    "Bypass",
+                    "-File",
+                    ".vscode/host-menu.ps1",
+                    "${input:hostAction}"
+                ]
+            }
+        },
+        {
+            "label": "Zephyr: Build",
+            "type": "shell",
+            "dependsOn": "Zephyr: Ensure workspace",
+            "command": "west",
+            "args": [
+                "build",
+                "-b",
+                "m2s_hello_fpga_kit/m2s010",
+                "-s",
+                "${workspaceFolder}",
+                "-d",
+                "build"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Zephyr: Pristine Build",
+            "type": "shell",
+            "dependsOn": "Zephyr: Ensure workspace",
+            "command": "west",
+            "args": [
+                "build",
+                "-p",
+                "always",
+                "-b",
+                "m2s_hello_fpga_kit/m2s010",
+                "-s",
+                "${workspaceFolder}",
+                "-d",
+                "build"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "group": "build",
+            "problemMatcher": []
+        },
+        {
+            "label": "GUI: Hello FPGA tester",
+            "type": "process",
+            "command": "powershell.exe",
+            "args": [
+                "-NoProfile",
+                "-ExecutionPolicy",
+                "Bypass",
+                "-File",
+                ".vscode/host-menu.ps1",
+                "${input:guiAction}"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Docs: Live preview (http://localhost:8000)",
+            "detail": "Host task: builds docs/site in Docker and rebuilds on every change",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "compose",
+                "up",
+                "--build",
+                "docs"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "isBackground": true,
+            "problemMatcher": {
+                "owner": "sphinx",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^(?:\\S+\\s+\\|\\s+)?/workspace/(.*?):(\\d+): (WARNING|ERROR): (.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "message": 4
+                },
+                "background": {
+                    "activeBegins": true,
+                    "beginsPattern": "Running Sphinx",
+                    "endsPattern": "Serving on http"
+                }
+            }
+        },
+        {
+            "label": "Docs: Build (strict, like CI)",
+            "detail": "Host task: one full build with warnings as errors, output in docs/site/_build/html",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "compose",
+                "run",
+                "--rm",
+                "--build",
+                "--no-deps",
+                "docs",
+                "sphinx-build",
+                "-E",
+                "-W",
+                "--keep-going",
+                "-b",
+                "html",
+                "docs/site",
+                "docs/site/_build/html"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": {
+                "owner": "sphinx",
+                "fileLocation": ["relative", "${workspaceFolder}"],
+                "pattern": {
+                    "regexp": "^/workspace/(.*?):(\\d+): (WARNING|ERROR): (.*)$",
+                    "file": 1,
+                    "line": 2,
+                    "severity": 3,
+                    "message": 4
+                }
+            }
+        },
+        {
+            "label": "Docs: Stop preview",
+            "type": "shell",
+            "command": "docker",
+            "args": [
+                "compose",
+                "stop",
+                "docs"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Zephyr: Clean",
+            "type": "shell",
+            "command": "rm",
+            "args": [
+                "-rf",
+                "build"
+            ],
+            "options": {
+                "cwd": "${workspaceFolder}"
+            },
+            "problemMatcher": []
+        },
+        {
+            "label": "Zephyr: Ccache Stats",
+            "type": "shell",
+            "command": "ccache",
+            "args": [
+                "--show-stats"
+            ],
+            "problemMatcher": []
+        },
+        {
+            "label": "Zephyr: Ccache Clear",
+            "type": "shell",
+            "command": "ccache",
+            "args": [
+                "--clear"
+            ],
+            "problemMatcher": []
+        }
+    ],
+    "inputs": [
+        {
+            "id": "zephyrAction",
+            "type": "pickString",
+            "description": "Choose a West workspace action",
+            "options": [
+                "Initialize + update",
+                "Update dependencies",
+                "Build firmware",
+                "Clean and Build",
+                "Clean",
+                "Docs: Live preview",
+                "Docs: Build (strict, like CI)",
+                "Docs: Stop preview"
+            ]
+        },
+        {
+            "id": "hostAction",
+            "type": "pickString",
+            "description": "Choose a host (Windows) action",
+            "options": [
+                "Create .venv",
+                "Run Hello FPGA GUI",
+                "Run Hello FPGA GUI (simulator)",
+                "Test Hello FPGA GUI",
+                "Docs: Live preview",
+                "Docs: Build (strict, like CI)",
+                "Docs: Stop preview"
+            ]
+        },
+        {
+            "id": "guiAction",
+            "type": "pickString",
+            "description": "Hello FPGA Kit test GUI",
+            "options": [
+                "Run Hello FPGA GUI",
+                "Run Hello FPGA GUI (simulator)",
+                "Test Hello FPGA GUI",
+                "Create .venv"
+            ]
+        }
+    ]
+}

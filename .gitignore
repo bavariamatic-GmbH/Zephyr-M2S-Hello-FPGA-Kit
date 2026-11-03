@@ -1,0 +1,43 @@
+# Zephyr and west build state
+/.west/
+**/build/
+**/build-*/
+/out/
+/output/
+
+# Build caches
+/.ccache/
+**/.cache/
+
+# Python environments and generated files
+.venv/
+venv/
+env/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+
+# CMake-generated files outside build directories
+/CMakeFiles/
+/CMakeCache.txt
+/cmake_install.cmake
+/compile_commands.json
+
+# Logs and crash dumps
+*.log
+core
+core.*
+
+# Local IDE files (keep shared .vscode project configuration)
+.idea/
+
+# Operating system files
+.DS_Store
+Thumbs.db
+Desktop.ini
+
+# Project web page (docs/site): build output and pages copied from the repository
+/docs/site/_build/
+/docs/site/generated/

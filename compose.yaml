@@ -1,0 +1,67 @@
+services:
+
+  # Firmware build environment. Same image as the dev container and
+  # GitHub Codespaces (.devcontainer/devcontainer.json), published by
+  # .github/workflows/container.yml. "docker compose pull zephyr" fetches it,
+  # "docker compose build zephyr" builds it from the Dockerfile.
+  zephyr:
+    image: ghcr.io/bavariamatic-gmbh/zephyr-m2s-hello-fpga-kit:1.0.1
+    build: .
+
+    working_dir: /workspace
+
+    volumes:
+      - .:/workspace
+      - ./.ccache:/ccache
+
+    environment:
+      CCACHE_DIR: /ccache
+      ZEPHYR_TOOLCHAIN_VARIANT: zephyr
+      ZEPHYR_SDK_INSTALL_DIR: /opt/zephyr-sdk
+
+    command:
+      - west
+      - build
+      - -b
+      - m2s_hello_fpga_kit/m2s010
+      - -d
+      - build
+
+  # Project web page (docs/site), live preview on http://localhost:8000.
+  # VS Code tasks "Docs: Live preview" / "Docs: Build (strict)".
+  docs:
+    image: zephyr-m2s-hello-fpga-kit-docs:local
+    build: docs/site
+
+    working_dir: /workspace
+
+    volumes:
+      - .:/workspace
+
+    ports:
+      - "8000:8000"
+
+    environment:
+      # File change events do not reach containers from Windows bind mounts
+      WATCHFILES_FORCE_POLLING: "true"
+      # Print "Serving on ..." at once (the VS Code task waits for it)
+      PYTHONUNBUFFERED: "1"
+
+    command:
+      - sphinx-autobuild
+      - docs/site
+      - docs/site/_build/html
+      - --host
+      - 0.0.0.0
+      - --port
+      - "8000"
+      - --watch
+      - README.md
+      - --watch
+      - docs
+      - --watch
+      - tools/hello_fpga_gui/README.md
+      - --ignore
+      - "*/docs/site/generated/*"
+      - --ignore
+      - "*/docs/site/_build/*"

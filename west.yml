@@ -1,0 +1,16 @@
+manifest:
+  remotes:
+    - name: zephyrproject-rtos
+      url-base: https://github.com/zephyrproject-rtos
+
+  projects:
+    - name: zephyr
+      remote: zephyrproject-rtos
+      # The m2s_hello_fpga_kit board is part of Zephyr from 4.5.
+      # Move to v4.5.0 once it is tagged.
+      revision: v4.5.0-rc3
+      import:
+        # Only the modules SmartFusion2 firmware needs; add names here
+        # (for example littlefs, mbedtls) when an application uses them.
+        name-allowlist:
+          - cmsis_6

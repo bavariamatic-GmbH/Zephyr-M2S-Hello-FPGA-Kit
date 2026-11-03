@@ -1,0 +1,43 @@
+.git
+.git/**
+.west
+build
+build-*
+out
+output
+
+# Zephyr generated files
+**/build
+**/.cache
+
+# Python
+__pycache__
+*.pyc
+.venv
+venv
+
+# IDE
+.vscode
+.idea
+
+# OS
+.DS_Store
+
+# Microchip / Libero
+*.prjx
+*.pdb
+*.log
+*.job
+*.stp
+*.adb
+*.fdc
+*.sdc
+
+# FPGA generated data
+component
+designer
+smartgen
+simulation
+synthesis
+layout
+export
